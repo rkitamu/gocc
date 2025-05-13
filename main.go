@@ -3,17 +3,62 @@ package main
 import (
 	"fmt"
 	"os"
+	"flag"
 
-	"rkitamu/gocc/args"
+	"rkitamu/gocc/lexer"
 )
 
+type Args struct {
+	Input  string
+	Output string
+	Debug  bool
+}
+
+func parseArgs() (*Args, error) {
+	input := flag.String("i", "", "Input file name")
+	output := flag.String("o", "tmp.s", "Output file name")
+	debug := flag.Bool("d", false, "Enable debug mode")
+
+	flag.Parse()
+
+	if *input == "" {
+		return nil, fmt.Errorf("input file name is required")
+	}
+
+	args := &Args{
+		Input: *input,
+		Output: *output,
+		Debug: *debug,
+	}
+
+	return args, nil;
+}
+
 func main() {
-	// コマンドライン引数を解析
-	args, err := args.ParseArgs()
-	if err != nil {
+	if err := run(); err != nil {
 		fmt.Println("Error:", err)
 		os.Exit(1)
 	}
+}
 
-	fmt.Printf("Input file name: %s\n", args.Input)
+func run() error {
+	// コマンドライン引数を解析
+	cliArgs, err := parseArgs()
+	if err != nil {
+		return err
+	}
+	
+	// read input file
+	input, err := os.ReadFile(cliArgs.Input)
+	if err != nil {
+		return fmt.Errorf("failed to read input file: %w", err)
+	}
+
+	// lex input
+	_, err = lexer.Lex(string(input))
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
