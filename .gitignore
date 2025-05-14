@@ -26,3 +26,5 @@ gocc
 go.work
 
 # End of https://www.toptal.com/developers/gitignore/api/go
+
+compile_target/**/*

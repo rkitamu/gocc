@@ -1,0 +1,15 @@
+{
+    // Configurations for debugging and running Go code
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug",
+            "type": "go",
+            "request": "launch",
+            "mode": "debug",
+            "program": "${workspaceFolder}",
+            "args": ["-i", "${workspaceFolder}/compile_target/main.c"],
+            "env": {},
+        }
+    ]
+}
