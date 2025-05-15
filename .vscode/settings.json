@@ -1,0 +1,8 @@
+{
+  "go.useLanguageServer": true,
+  "go.lintTool": "golangci-lint",
+  "go.formatTool": "gofmt",
+  "editor.formatOnSave": true,
+  "go.testFlags": ["-v"],
+  "go.toolsManagement.autoUpdate": true
+}
