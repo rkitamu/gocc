@@ -1,11 +1,12 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
-	"flag"
 
 	"rkitamu/gocc/lexer"
+	"rkitamu/gocc/parser"
 )
 
 type Args struct {
@@ -26,12 +27,12 @@ func parseArgs() (*Args, error) {
 	}
 
 	args := &Args{
-		Input: *input,
+		Input:  *input,
 		Output: *output,
-		Debug: *debug,
+		Debug:  *debug,
 	}
 
-	return args, nil;
+	return args, nil
 }
 
 func main() {
@@ -47,7 +48,7 @@ func run() error {
 	if err != nil {
 		return err
 	}
-	
+
 	// read input file
 	input, err := os.ReadFile(cliArgs.Input)
 	if err != nil {
@@ -55,7 +56,14 @@ func run() error {
 	}
 
 	// lex input
-	_, err = lexer.Lex(string(input))
+	tokens, err := lexer.Lex(string(input))
+	if err != nil {
+		return err
+	}
+
+	// parse tokens
+	parser := parser.NewParser(tokens)
+	_, err = parser.Parse()
 	if err != nil {
 		return err
 	}
