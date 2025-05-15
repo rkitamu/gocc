@@ -77,11 +77,11 @@ func TestGenerator_Subtraction(t *testing.T) {
 func TestGenerator_NestedExpr(t *testing.T) {
 	node := &parser.Node{
 		Kind: parser.ADD,
-		Lhs: &parser.Node{Kind: parser.NUM, Val: 1},
+		Lhs:  &parser.Node{Kind: parser.NUM, Val: 1},
 		Rhs: &parser.Node{
 			Kind: parser.MUL,
-			Lhs: &parser.Node{Kind: parser.NUM, Val: 2},
-			Rhs: &parser.Node{Kind: parser.NUM, Val: 3},
+			Lhs:  &parser.Node{Kind: parser.NUM, Val: 2},
+			Rhs:  &parser.Node{Kind: parser.NUM, Val: 3},
 		},
 	}
 

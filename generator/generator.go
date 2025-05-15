@@ -2,8 +2,8 @@ package generator
 
 import (
 	"fmt"
-	"strings"
 	"rkitamu/gocc/parser"
+	"strings"
 )
 
 type Generator struct {
@@ -26,9 +26,7 @@ func (g *Generator) Generate(node *parser.Node) string {
 	g.emit("  pop rax")
 	g.emit("  ret")
 
-	g.emit("ret")
 	g.emit(".section .note.GNU-stack,\"\",@progbits")
-
 	return g.sb.String()
 }
 
