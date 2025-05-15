@@ -1,0 +1,25 @@
+package parser
+
+// NodeKind represents the type of a node in the AST.
+type NodeKind int
+
+const (
+	ADD NodeKind = iota // +
+	SUB                 // -
+	MUL                 // *
+	DIV                 // /
+	EQ                  // ==
+	NEQ                 // !=
+	LT                  // <
+	LE                  // <=
+	NUM                 // number literal
+	EOF                 // end of file (optional, not usually needed in AST)
+)
+
+// Node represents a node in the abstract syntax tree (AST).
+type Node struct {
+	Kind NodeKind // The kind of node (operator, number, etc.)
+	Lhs  *Node    // Left-hand side expression
+	Rhs  *Node    // Right-hand side expression
+	Val  int      // Literal value (only used if Kind == NUM)
+}

@@ -2,10 +2,12 @@ package lexer
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 )
 
 type TokenKind int
+
 const (
 	RESERVED TokenKind = iota
 	NUM
@@ -13,9 +15,10 @@ const (
 )
 
 type Token struct {
-	kind TokenKind;
-	str string
-	next *Token;
+	Kind TokenKind
+	Next *Token
+	Str  string
+	Val  int
 }
 
 func isSpace(ch rune) bool {
@@ -53,16 +56,20 @@ func Lex(input string) (*Token, error) {
 			for pos < len(runes) && isDigit(runes[pos]) {
 				pos++
 			}
-			value := string(runes[start:pos])
-			cur.next = &Token{kind: NUM, str: value}
-			cur = cur.next
+			valueStr := string(runes[start:pos])
+			valueInt, err := strconv.Atoi(valueStr)
+			if err != nil {
+				return nil, fmt.Errorf("failed to convert string to int: %s", valueStr)
+			}
+			cur.Next = &Token{Kind: NUM, Str: valueStr, Val: valueInt}
+			cur = cur.Next
 			continue
 		}
 
 		// if it's a symbol, create a RESERVED token
 		if isSymbol(ch) {
-			cur.next = &Token{kind: RESERVED, str: string(ch)}
-			cur = cur.next
+			cur.Next = &Token{Kind: RESERVED, Str: string(ch)}
+			cur = cur.Next
 			pos++
 			continue
 		}
@@ -71,6 +78,6 @@ func Lex(input string) (*Token, error) {
 		return nil, fmt.Errorf("unknown character: %c", ch)
 	}
 
-	cur.next = &Token{kind: EOF, str: ""}
-	return head.next, nil
+	cur.Next = &Token{Kind: EOF, Str: ""}
+	return head.Next, nil
 }

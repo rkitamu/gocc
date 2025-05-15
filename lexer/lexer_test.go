@@ -13,10 +13,10 @@ func TestLexer(t *testing.T) {
 			name:  "simple test",
 			input: "1+2",
 			want: []Token{
-				{kind: NUM, str: "1"},
-				{kind: RESERVED, str: "+"},
-				{kind: NUM, str: "2"},
-				{kind: EOF, str: ""},
+				{Kind: NUM, Str: "1"},
+				{Kind: RESERVED, Str: "+"},
+				{Kind: NUM, Str: "2"},
+				{Kind: EOF, Str: ""},
 			},
 			wantErr: false,
 		},
@@ -24,14 +24,14 @@ func TestLexer(t *testing.T) {
 			name:  "complex test",
 			input: "3*(4-5)",
 			want: []Token{
-				{kind: NUM, str: "3"},
-				{kind: RESERVED, str: "*"},
-				{kind: RESERVED, str: "("},
-				{kind: NUM, str: "4"},
-				{kind: RESERVED, str: "-"},
-				{kind: NUM, str: "5"},
-				{kind: RESERVED, str: ")"},
-				{kind: EOF, str: ""},
+				{Kind: NUM, Str: "3"},
+				{Kind: RESERVED, Str: "*"},
+				{Kind: RESERVED, Str: "("},
+				{Kind: NUM, Str: "4"},
+				{Kind: RESERVED, Str: "-"},
+				{Kind: NUM, Str: "5"},
+				{Kind: RESERVED, Str: ")"},
+				{Kind: EOF, Str: ""},
 			},
 			wantErr: false,
 		},
@@ -46,19 +46,19 @@ func TestLexer(t *testing.T) {
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
 			got, err := Lex(c.input)
-	
+
 			if c.wantErr {
 				if err == nil {
 					t.Errorf("Lex() expected error, but got none")
 				}
 				return // ✅ エラーが出るのが期待通りなので終了
 			}
-	
+
 			if err != nil {
 				t.Errorf("Lex() unexpected error: %v", err)
 				return
 			}
-	
+
 			// ✅ トークンの比較
 			curr := got
 			for i, token := range c.want {
@@ -66,10 +66,10 @@ func TestLexer(t *testing.T) {
 					t.Errorf("Lex() returned too few tokens, missing token: %v", token)
 					break
 				}
-				if curr.kind != token.kind || curr.str != token.str {
+				if curr.Kind != token.Kind || curr.Str != token.Str {
 					t.Errorf("Token %d: got = %v, want = %v", i, curr, token)
 				}
-				curr = curr.next
+				curr = curr.Next
 			}
 			if curr != nil {
 				t.Errorf("Lex() returned too many tokens, extra: %v", curr)
