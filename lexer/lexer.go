@@ -6,21 +6,6 @@ import (
 	"strings"
 )
 
-type TokenKind int
-
-const (
-	RESERVED TokenKind = iota
-	NUM
-	EOF
-)
-
-type Token struct {
-	Kind TokenKind
-	Next *Token
-	Str  string
-	Val  int
-}
-
 func isSpace(ch rune) bool {
 	return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r'
 }
