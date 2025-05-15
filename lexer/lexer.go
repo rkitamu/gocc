@@ -15,7 +15,8 @@ func isDigit(ch rune) bool {
 }
 
 func isSymbol(ch rune) bool {
-	return strings.ContainsRune("+-*/=()", ch)
+
+	return strings.ContainsRune("+-*/=()<>", ch)
 }
 
 // Lex takes an input string and returns a linked list of tokens.
@@ -49,6 +50,18 @@ func Lex(input string) (*Token, error) {
 			cur.Next = &Token{Kind: NUM, Str: valueStr, Val: valueInt}
 			cur = cur.Next
 			continue
+		}
+
+		// if it's a symbol, check for multi-character operators
+		if pos+1 < len(runes) {
+			two := string(runes[pos : pos+2])
+			switch two {
+			case "==", "!=", "<=", ">=":
+				cur.Next = &Token{Kind: RESERVED, Str: two}
+				cur = cur.Next
+				pos += 2
+				continue
+			}
 		}
 
 		// if it's a symbol, create a RESERVED token
