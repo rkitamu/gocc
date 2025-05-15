@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 
+	"rkitamu/gocc/generator"
 	"rkitamu/gocc/lexer"
 	"rkitamu/gocc/parser"
 )
@@ -17,7 +18,7 @@ type Args struct {
 
 func parseArgs() (*Args, error) {
 	input := flag.String("i", "", "Input file name")
-	output := flag.String("o", "tmp.s", "Output file name")
+	output := flag.String("o", "out.s", "Output file name")
 	debug := flag.Bool("d", false, "Enable debug mode")
 
 	flag.Parse()
@@ -72,6 +73,15 @@ func run() error {
 	if cliArgs.Debug {
 		fmt.Println("=== AST ===")
 		parser.PrintTree(node)
+	}
+
+	// generate assembly code
+	gen := generator.NewGenerator()
+	asm := gen.Generate(node)
+
+	// write to output file
+	if err := os.WriteFile(cliArgs.Output, []byte(asm), 0644); err != nil {
+		return fmt.Errorf("failed to write output file: %w", err)
 	}
 
 	return nil
