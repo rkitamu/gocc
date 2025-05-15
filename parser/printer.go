@@ -56,7 +56,7 @@ func nodeKindToString(kind NodeKind) string {
 		return "!="
 	case LT:
 		return "<"
-	case LE:
+	case LTE:
 		return "<="
 	default:
 		return "?"

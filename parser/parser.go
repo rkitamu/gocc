@@ -114,7 +114,7 @@ func (p *Parser) relational() (*Node, error) {
 			if err != nil {
 				return nil, err
 			}
-			node = &Node{Kind: LE, Lhs: node, Rhs: rhs}
+			node = &Node{Kind: LTE, Lhs: node, Rhs: rhs}
 		case p.match(">"):
 			p.advance()
 			lhs, err := p.add()
@@ -130,7 +130,7 @@ func (p *Parser) relational() (*Node, error) {
 				return nil, err
 			}
 			// ">=" is equivalent to "<=" in reverse
-			node = &Node{Kind: LE, Lhs: lhs, Rhs: node}
+			node = &Node{Kind: LTE, Lhs: lhs, Rhs: node}
 		default:
 			return node, nil
 		}

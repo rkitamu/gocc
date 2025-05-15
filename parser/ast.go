@@ -11,7 +11,7 @@ const (
 	EQ                  // ==
 	NEQ                 // !=
 	LT                  // <
-	LE                  // <=
+	LTE                  // <=
 	NUM                 // number literal
 	EOF                 // end of file (optional, not usually needed in AST)
 )

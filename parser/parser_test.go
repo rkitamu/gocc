@@ -83,7 +83,7 @@ func TestParse_GrammarCoverage(t *testing.T) {
 		{
 			name:   "relational >=: 5 >= 1 + 2",
 			tokens: &lexer.Token{Kind: lexer.NUM, Val: 5, Str: "5", Next: &lexer.Token{Kind: lexer.RESERVED, Str: ">=", Next: &lexer.Token{Kind: lexer.NUM, Val: 1, Str: "1", Next: &lexer.Token{Kind: lexer.RESERVED, Str: "+", Next: &lexer.Token{Kind: lexer.NUM, Val: 2, Str: "2", Next: &lexer.Token{Kind: lexer.EOF}}}}}},
-			want: &parser.Node{Kind: parser.LE,
+			want: &parser.Node{Kind: parser.LTE,
 				Lhs: &parser.Node{Kind: parser.ADD,
 					Lhs: &parser.Node{Kind: parser.NUM, Val: 1},
 					Rhs: &parser.Node{Kind: parser.NUM, Val: 2},
