@@ -27,4 +27,8 @@ go.work
 
 # End of https://www.toptal.com/developers/gitignore/api/go
 
+# launch.json
 compile_target/**/*
+
+# tmporary files
+*.tmp
