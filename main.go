@@ -63,9 +63,15 @@ func run() error {
 
 	// parse tokens
 	parser := parser.NewParser(tokens)
-	_, err = parser.Parse()
+	node, err := parser.Parse()
 	if err != nil {
 		return err
+	}
+
+	// optionally print AST
+	if cliArgs.Debug {
+		fmt.Println("=== AST ===")
+		parser.PrintTree(node)
 	}
 
 	return nil
