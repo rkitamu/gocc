@@ -4,6 +4,8 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+
+	"rkitamu/gocc/errors"
 )
 
 func isSpace(ch rune) bool {
@@ -15,7 +17,6 @@ func isDigit(ch rune) bool {
 }
 
 func isSymbol(ch rune) bool {
-
 	return strings.ContainsRune("+-*/=()<>", ch)
 }
 
@@ -45,9 +46,13 @@ func Lex(input string) (*Token, error) {
 			valueStr := string(runes[start:pos])
 			valueInt, err := strconv.Atoi(valueStr)
 			if err != nil {
-				return nil, fmt.Errorf("failed to convert string to int: %s", valueStr)
+				return nil, errors.NewPosError(
+					fmt.Sprintf("invalid numeric literal: %s", valueStr),
+					input,
+					start,
+				)
 			}
-			cur.Next = &Token{Kind: NUM, Str: valueStr, Val: valueInt}
+			cur.Next = &Token{Kind: NUM, Str: valueStr, Val: valueInt, Pos: start}
 			cur = cur.Next
 			continue
 		}
@@ -57,7 +62,7 @@ func Lex(input string) (*Token, error) {
 			two := string(runes[pos : pos+2])
 			switch two {
 			case "==", "!=", "<=", ">=":
-				cur.Next = &Token{Kind: RESERVED, Str: two}
+				cur.Next = &Token{Kind: RESERVED, Str: two, Pos: pos}
 				cur = cur.Next
 				pos += 2
 				continue
@@ -66,14 +71,18 @@ func Lex(input string) (*Token, error) {
 
 		// if it's a symbol, create a RESERVED token
 		if isSymbol(ch) {
-			cur.Next = &Token{Kind: RESERVED, Str: string(ch)}
+			cur.Next = &Token{Kind: RESERVED, Str: string(ch), Pos: pos}
 			cur = cur.Next
 			pos++
 			continue
 		}
 
 		// if it's an unknown character, return an error
-		return nil, fmt.Errorf("unknown character: %c", ch)
+		return nil, errors.NewPosError(
+			fmt.Sprintf("unexpected character: %c", ch),
+			input,
+			pos,
+		)
 	}
 
 	cur.Next = &Token{Kind: EOF, Str: ""}

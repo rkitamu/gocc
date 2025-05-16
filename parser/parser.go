@@ -2,14 +2,16 @@ package parser
 
 import (
 	"fmt"
+	"rkitamu/gocc/errors"
 	"rkitamu/gocc/lexer"
 )
 
 type Parser struct {
 	current *lexer.Token
+	input   string
 }
 
-func NewParser(token *lexer.Token) *Parser {
+func NewParser(token *lexer.Token, input string) *Parser {
 	return &Parser{current: token}
 }
 
@@ -38,10 +40,18 @@ func (p *Parser) match(op string) bool {
 
 func (p *Parser) expect(op string) error {
 	if p.current == nil {
-		return fmt.Errorf("expected %s, but got EOF", op)
+		return errors.NewPosError(
+			fmt.Sprintf("expected %s, but got EOF", op),
+			p.input,
+			len(p.input), // assuming EOF is at the end of the input
+		)
 	}
 	if p.current.Str != op {
-		return fmt.Errorf("expected %s, but got %s", op, p.current.Str)
+		return errors.NewPosError(
+			fmt.Sprintf("expected %s, but got %s", op, p.current.Str),
+			p.input,
+			p.current.Pos,
+		)
 	}
 	p.advance()
 	return nil
@@ -49,10 +59,18 @@ func (p *Parser) expect(op string) error {
 
 func (p *Parser) expectNum() (int, error) {
 	if p.current == nil {
-		return 0, fmt.Errorf("expected number, but got EOF")
+		return 0, errors.NewPosError(
+			"expected number, but got EOF",
+			p.input,
+			len(p.input), // assuming EOF is at the end of the input
+		)
 	}
 	if p.current.Kind != lexer.NUM {
-		return 0, fmt.Errorf("expected number, but got %s", p.current.Str)
+		return 0, errors.NewPosError(
+			fmt.Sprintf("expected number, but got %s", p.current.Str),
+			p.input,
+			p.current.Pos,
+		)
 	}
 	val := p.current.Val
 	p.advance()

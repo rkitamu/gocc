@@ -13,4 +13,5 @@ type Token struct {
 	Next *Token
 	Str  string
 	Val  int
+	Pos  int // Position in the input string
 }

@@ -20,11 +20,13 @@ func EqualAST(a, b *parser.Node) bool {
 func TestParse_GrammarCoverage(t *testing.T) {
 	tests := []struct {
 		name   string
+		input  string
 		tokens *lexer.Token
 		want   *parser.Node
 	}{
 		{
-			name: "equality ==: 1 + 2 == 3",
+			name:  "equality ==: 1 + 2 == 3",
+			input: "1 + 2 == 3",
 			tokens: &lexer.Token{
 				Kind: lexer.NUM, Val: 1, Str: "1", Next: &lexer.Token{
 					Kind: lexer.RESERVED, Str: "+", Next: &lexer.Token{
@@ -47,7 +49,8 @@ func TestParse_GrammarCoverage(t *testing.T) {
 			},
 		},
 		{
-			name: "add +: 1 + 2 + 3",
+			name:  "add +: 1 + 2 + 3",
+			input: "1 + 2 + 3",
 			tokens: &lexer.Token{
 				Kind: lexer.NUM, Val: 1, Str: "1", Next: &lexer.Token{
 					Kind: lexer.RESERVED, Str: "+", Next: &lexer.Token{
@@ -71,6 +74,7 @@ func TestParse_GrammarCoverage(t *testing.T) {
 		},
 		{
 			name:   "unary -: -1 + 2",
+			input:  "-1 + 2",
 			tokens: &lexer.Token{Kind: lexer.RESERVED, Str: "-", Next: &lexer.Token{Kind: lexer.NUM, Val: 1, Str: "1", Next: &lexer.Token{Kind: lexer.RESERVED, Str: "+", Next: &lexer.Token{Kind: lexer.NUM, Val: 2, Str: "2", Next: &lexer.Token{Kind: lexer.EOF}}}}},
 			want: &parser.Node{Kind: parser.ADD,
 				Lhs: &parser.Node{Kind: parser.SUB,
@@ -82,6 +86,7 @@ func TestParse_GrammarCoverage(t *testing.T) {
 		},
 		{
 			name:   "relational >=: 5 >= 1 + 2",
+			input:  "5 >= 1 + 2",
 			tokens: &lexer.Token{Kind: lexer.NUM, Val: 5, Str: "5", Next: &lexer.Token{Kind: lexer.RESERVED, Str: ">=", Next: &lexer.Token{Kind: lexer.NUM, Val: 1, Str: "1", Next: &lexer.Token{Kind: lexer.RESERVED, Str: "+", Next: &lexer.Token{Kind: lexer.NUM, Val: 2, Str: "2", Next: &lexer.Token{Kind: lexer.EOF}}}}}},
 			want: &parser.Node{Kind: parser.LTE,
 				Lhs: &parser.Node{Kind: parser.ADD,
@@ -93,6 +98,7 @@ func TestParse_GrammarCoverage(t *testing.T) {
 		},
 		{
 			name:   "grouping (1 + 2) * 3: (1 + 2) * 3",
+			input:  "(1 + 2) * 3",
 			tokens: &lexer.Token{Kind: lexer.RESERVED, Str: "(", Next: &lexer.Token{Kind: lexer.NUM, Val: 1, Str: "1", Next: &lexer.Token{Kind: lexer.RESERVED, Str: "+", Next: &lexer.Token{Kind: lexer.NUM, Val: 2, Str: "2", Next: &lexer.Token{Kind: lexer.RESERVED, Str: ")", Next: &lexer.Token{Kind: lexer.RESERVED, Str: "*", Next: &lexer.Token{Kind: lexer.NUM, Val: 3, Str: "3", Next: &lexer.Token{Kind: lexer.EOF}}}}}}}},
 			want: &parser.Node{Kind: parser.MUL,
 				Lhs: &parser.Node{Kind: parser.ADD,
@@ -104,6 +110,7 @@ func TestParse_GrammarCoverage(t *testing.T) {
 		},
 		{
 			name:   "not equal !=: 1 != 2",
+			input:  "1 != 2",
 			tokens: &lexer.Token{Kind: lexer.NUM, Val: 1, Str: "1", Next: &lexer.Token{Kind: lexer.RESERVED, Str: "!=", Next: &lexer.Token{Kind: lexer.NUM, Val: 2, Str: "2", Next: &lexer.Token{Kind: lexer.EOF}}}},
 			want: &parser.Node{Kind: parser.NEQ,
 				Lhs: &parser.Node{Kind: parser.NUM, Val: 1},
@@ -112,6 +119,7 @@ func TestParse_GrammarCoverage(t *testing.T) {
 		},
 		{
 			name:   "less than <: 1 < 2",
+			input:  "1 < 2",
 			tokens: &lexer.Token{Kind: lexer.NUM, Val: 1, Str: "1", Next: &lexer.Token{Kind: lexer.RESERVED, Str: "<", Next: &lexer.Token{Kind: lexer.NUM, Val: 2, Str: "2", Next: &lexer.Token{Kind: lexer.EOF}}}},
 			want: &parser.Node{Kind: parser.LT,
 				Lhs: &parser.Node{Kind: parser.NUM, Val: 1},
@@ -120,6 +128,7 @@ func TestParse_GrammarCoverage(t *testing.T) {
 		},
 		{
 			name:   "multiply *: 2 * 3",
+			input:  "2 * 3",
 			tokens: &lexer.Token{Kind: lexer.NUM, Val: 2, Str: "2", Next: &lexer.Token{Kind: lexer.RESERVED, Str: "*", Next: &lexer.Token{Kind: lexer.NUM, Val: 3, Str: "3", Next: &lexer.Token{Kind: lexer.EOF}}}},
 			want: &parser.Node{Kind: parser.MUL,
 				Lhs: &parser.Node{Kind: parser.NUM, Val: 2},
@@ -130,7 +139,7 @@ func TestParse_GrammarCoverage(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := parser.NewParser(tt.tokens)
+			p := parser.NewParser(tt.tokens, tt.input)
 			got, err := p.Parse()
 			if err != nil {
 				t.Fatalf("parse error: %v", err)

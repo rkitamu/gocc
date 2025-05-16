@@ -51,19 +51,20 @@ func run() error {
 	}
 
 	// read input file
-	input, err := os.ReadFile(cliArgs.Input)
+	inputByte, err := os.ReadFile(cliArgs.Input)
+	input := string(inputByte)
 	if err != nil {
 		return fmt.Errorf("failed to read input file: %w", err)
 	}
 
 	// lex input
-	tokens, err := lexer.Lex(string(input))
+	tokens, err := lexer.Lex(input)
 	if err != nil {
 		return err
 	}
 
 	// parse tokens
-	parser := parser.NewParser(tokens)
+	parser := parser.NewParser(tokens, input)
 	node, err := parser.Parse()
 	if err != nil {
 		return err

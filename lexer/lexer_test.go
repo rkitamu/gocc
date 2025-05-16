@@ -36,7 +36,7 @@ func TestLexer(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "digit test",
+			name:  "digit test",
 			input: "1234567890",
 			want: []Token{
 				{Kind: NUM, Str: "1234567890"},
@@ -45,7 +45,7 @@ func TestLexer(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "plus test",
+			name:  "plus test",
 			input: "1+2",
 			want: []Token{
 				{Kind: NUM, Str: "1"},
@@ -56,7 +56,7 @@ func TestLexer(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "minus test",
+			name:  "minus test",
 			input: "1-2",
 			want: []Token{
 				{Kind: NUM, Str: "1"},
@@ -67,7 +67,7 @@ func TestLexer(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "multiply test",
+			name:  "multiply test",
 			input: "1*2",
 			want: []Token{
 				{Kind: NUM, Str: "1"},
@@ -78,7 +78,7 @@ func TestLexer(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "divide test",
+			name:  "divide test",
 			input: "1/2",
 			want: []Token{
 				{Kind: NUM, Str: "1"},
@@ -89,7 +89,7 @@ func TestLexer(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "less than test",
+			name:  "less than test",
 			input: "1<2",
 			want: []Token{
 				{Kind: NUM, Str: "1"},
@@ -100,7 +100,7 @@ func TestLexer(t *testing.T) {
 			wantErr: false,
 		},
 		{
-			name: "greater than test",
+			name:  "greater than test",
 			input: "1>2",
 			want: []Token{
 				{Kind: NUM, Str: "1"},
