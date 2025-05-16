@@ -4,6 +4,7 @@ type TokenKind int
 
 const (
 	RESERVED TokenKind = iota
+	IDENT
 	NUM
 	EOF
 )

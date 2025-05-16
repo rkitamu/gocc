@@ -8,6 +8,14 @@ import (
 	"rkitamu/gocc/errors"
 )
 
+type Lexer struct {
+	input string
+}
+
+func NewLexer(input string) *Lexer {
+	return &Lexer{input: input}
+}
+
 func isSpace(ch rune) bool {
 	return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r'
 }
@@ -21,8 +29,8 @@ func isSymbol(ch rune) bool {
 }
 
 // Lex takes an input string and returns a linked list of tokens.
-func Lex(input string) (*Token, error) {
-	runes := []rune(input)
+func (p *Lexer) Lex() (*Token, error) {
+	runes := []rune(p.input)
 	pos := 0
 
 	head := &Token{}
@@ -33,6 +41,14 @@ func Lex(input string) (*Token, error) {
 
 		// skip whitespace
 		if isSpace(ch) {
+			pos++
+			continue
+		}
+
+		// if it's a letter, create an IDENT token
+		if 'a' <= ch && ch <= 'z' {
+			cur.Next = &Token{Kind: IDENT, Str: string(ch), Pos: pos}
+			cur = cur.Next
 			pos++
 			continue
 		}
@@ -48,7 +64,7 @@ func Lex(input string) (*Token, error) {
 			if err != nil {
 				return nil, errors.NewPosError(
 					fmt.Sprintf("invalid numeric literal: %s", valueStr),
-					input,
+					p.input,
 					start,
 				)
 			}
@@ -80,7 +96,7 @@ func Lex(input string) (*Token, error) {
 		// if it's an unknown character, return an error
 		return nil, errors.NewPosError(
 			fmt.Sprintf("unexpected character: %c", ch),
-			input,
+			p.input,
 			pos,
 		)
 	}

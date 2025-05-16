@@ -58,7 +58,8 @@ func run() error {
 	}
 
 	// lex input
-	tokens, err := lexer.Lex(input)
+	lexer := lexer.NewLexer(input)
+	tokens, err := lexer.Lex()
 	if err != nil {
 		return err
 	}

@@ -164,7 +164,8 @@ func TestLexer(t *testing.T) {
 
 	for _, c := range cases {
 		t.Run(c.name, func(t *testing.T) {
-			got, err := Lex(c.input)
+			lexer := NewLexer(c.input)
+			got, err := lexer.Lex()
 
 			if c.wantErr {
 				if err == nil {
