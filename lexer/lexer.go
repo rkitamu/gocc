@@ -85,6 +85,6 @@ func Lex(input string) (*Token, error) {
 		)
 	}
 
-	cur.Next = &Token{Kind: EOF, Str: ""}
+	cur.Next = &Token{Kind: EOF, Str: "EOF", Pos: pos}
 	return head.Next, nil
 }

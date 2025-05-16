@@ -12,7 +12,7 @@ type Parser struct {
 }
 
 func NewParser(token *lexer.Token, input string) *Parser {
-	return &Parser{current: token}
+	return &Parser{current: token, input: input}
 }
 
 // Parse parses the input tokens and returns the root node of the parse tree.
