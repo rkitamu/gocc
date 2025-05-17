@@ -26,3 +26,9 @@ type Node struct {
 	Val    int      // Literal value (only used if Kind == NUM)
 	Offset int      // Offset for local variables (only used if Kind == LVAR)
 }
+
+type LVar struct {
+	Next   *LVar
+	Name   string
+	Offset int
+}

@@ -9,6 +9,7 @@ import (
 type Parser struct {
 	current *lexer.Token
 	Code    []*Node
+	locals  *LVar
 	input   string
 }
 
@@ -16,6 +17,7 @@ func NewParser(token *lexer.Token, input string) *Parser {
 	return &Parser{
 		current: token,
 		Code:    make([]*Node, 0),
+		locals:  nil,
 		input:   input,
 	}
 }
@@ -254,9 +256,30 @@ func (p *Parser) primary() (*Node, error) {
 		p.advance()
 		return &Node{Kind: NUM, Val: val}, nil
 	} else if p.current.Kind == lexer.IDENT {
-		offset := (rune(p.current.Str[0]) - 'a' + 1) * 8
+		node := &Node{Kind: LVAR}
+		lvar := p.findLVar(p.current)
+		if lvar != nil {
+			node.Offset = int(lvar.Offset)
+		} else {
+			var offset int
+			var next *LVar
+			if p.locals == nil {
+				offset = 8
+				next = nil
+			} else {
+				offset = p.locals.Offset + 8
+				next = p.locals
+			}
+			lvar = &LVar{
+				Name:   p.current.Str,
+				Next:   next,
+				Offset: offset,
+			}
+			node.Offset = lvar.Offset
+			p.locals = lvar
+		}
 		p.advance()
-		return &Node{Kind: LVAR, Offset: int(offset)}, nil
+		return node, nil
 	} else {
 		return nil, errors.NewPosError(
 			fmt.Sprintf("expected number or identifier, but got %s", p.current.Str),
@@ -296,5 +319,17 @@ func (p *Parser) expect(op string) error {
 		)
 	}
 	p.advance()
+	return nil
+}
+
+func (p *Parser) findLVar(token *lexer.Token) *LVar {
+	if p.locals == nil {
+		return nil
+	}
+	for l := p.locals; l != nil; l = l.Next {
+		if l.Name == token.Str {
+			return l
+		}
+	}
 	return nil
 }

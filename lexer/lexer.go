@@ -29,8 +29,8 @@ func isSymbol(ch rune) bool {
 }
 
 // Lex takes an input string and returns a linked list of tokens.
-func (p *Lexer) Lex() (*Token, error) {
-	runes := []rune(p.input)
+func (l *Lexer) Lex() (*Token, error) {
+	runes := []rune(l.input)
 	pos := 0
 
 	head := &Token{}
@@ -41,14 +41,6 @@ func (p *Lexer) Lex() (*Token, error) {
 
 		// skip whitespace
 		if isSpace(ch) {
-			pos++
-			continue
-		}
-
-		// if it's a letter, create an IDENT token
-		if 'a' <= ch && ch <= 'z' {
-			cur.Next = &Token{Kind: IDENT, Str: string(ch), Pos: pos}
-			cur = cur.Next
 			pos++
 			continue
 		}
@@ -64,7 +56,7 @@ func (p *Lexer) Lex() (*Token, error) {
 			if err != nil {
 				return nil, errors.NewPosError(
 					fmt.Sprintf("invalid numeric literal: %s", valueStr),
-					p.input,
+					l.input,
 					start,
 				)
 			}
@@ -93,10 +85,25 @@ func (p *Lexer) Lex() (*Token, error) {
 			continue
 		}
 
+		// if it's an identifier, create an IDENT token
+		if 'a' <= ch && ch <= 'z' {
+			start := pos
+			for pos < len(runes) && (isDigit(runes[pos]) || ('a' <= runes[pos] && runes[pos] <= 'z')) {
+				pos++
+			}
+			cur.Next = &Token{
+				Kind: IDENT,
+				Str:  string(runes[start:pos]),
+				Pos:  pos,
+			}
+			cur = cur.Next
+			continue
+		}
+
 		// if it's an unknown character, return an error
 		return nil, errors.NewPosError(
 			fmt.Sprintf("unexpected character: %c", ch),
-			p.input,
+			l.input,
 			pos,
 		)
 	}
