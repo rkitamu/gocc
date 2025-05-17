@@ -8,12 +8,20 @@ import (
 )
 
 type Generator struct {
-	sb *strings.Builder
+	sb       *strings.Builder
+	labelSeq int
+}
+
+func (g *Generator) newLabel() int {
+	label := g.labelSeq
+	g.labelSeq++
+	return label
 }
 
 func NewGenerator() *Generator {
 	return &Generator{
-		sb: &strings.Builder{},
+		sb:       &strings.Builder{},
+		labelSeq: 0,
 	}
 }
 
@@ -105,6 +113,33 @@ func (g *Generator) emitExpr(node *parser.Node) error {
 		g.emit("  mov rsp, rbp")
 		g.emit("  pop rbp")
 		g.emit("  ret")
+		return nil
+	} else if node.Kind == parser.IF {
+		label := g.newLabel()
+
+		// if
+		if err := g.emitExpr(node.Cond); err != nil {
+			return err
+		}
+		g.emit("  pop rax")
+		g.emit("  cmp rax, 0")
+		g.emit(fmt.Sprintf("  je .Lelse%d", label))
+
+		// then
+		if err := g.emitExpr(node.Then); err != nil {
+			return err
+		}
+		g.emit(fmt.Sprintf("  jmp .Lend%d", label))
+
+		// else (optional)
+		g.emit(fmt.Sprintf(".Lelse%d:", label))
+		if node.Else != nil {
+			if err := g.emitExpr(node.Else); err != nil {
+				return err
+			}
+		}
+
+		g.emit(fmt.Sprintf(".Lend%d:", label))
 		return nil
 	}
 

@@ -36,24 +36,6 @@ func isAlNum(ch rune) bool {
 	return isDigit(ch) || isAlpha(ch) || ch == '_'
 }
 
-func isKeyword(ch []rune, keyword string) bool {
-	// check if the length of ch is less than the length of keyword
-	if len(ch) < len(keyword) {
-		return false
-	}
-	// check if the first len(keyword) characters match
-	for i := 0; i < len(keyword); i++ {
-		if ch[i] != rune(keyword[i]) {
-			return false
-		}
-	}
-	// keyword must be followed by a non-alphanumeric character
-	if len(ch) > len(keyword) && isAlNum(ch[len(keyword)]) {
-		return false
-	}
-	return true
-}
-
 // Lex takes an input string and returns a linked list of tokens.
 func (l *Lexer) Lex() (*Token, error) {
 	runes := []rune(l.input)
@@ -91,17 +73,22 @@ func (l *Lexer) Lex() (*Token, error) {
 			continue
 		}
 
-		// if it's a return keyword, create a RETURN token
-		kw := "return"
-		if isKeyword(runes[pos:], kw) {
-			token := &Token{
-				Kind: RETURN,
-				Str:  kw,
-				Pos:  pos,
+		// if it's an identifier or keywords
+		if isAlpha(ch) {
+			start := pos
+			for pos < len(runes) && isAlNum(runes[pos]) {
+				pos++
 			}
-			cur.Next = token
+			word := string(runes[start:pos])
+			kind, ok := Keywords[word]
+			if ok {
+				// keyword
+				cur.Next = &Token{Kind: kind, Str: word, Pos: start}
+			} else {
+				// identifier
+				cur.Next = &Token{Kind: IDENT, Str: word, Pos: start}
+			}
 			cur = cur.Next
-			pos += len(kw)
 			continue
 		}
 
@@ -122,21 +109,6 @@ func (l *Lexer) Lex() (*Token, error) {
 			cur.Next = &Token{Kind: RESERVED, Str: string(ch), Pos: pos}
 			cur = cur.Next
 			pos++
-			continue
-		}
-
-		// if it's an identifier, create an IDENT token
-		if isAlpha(ch) {
-			start := pos
-			for pos < len(runes) && isAlNum(runes[pos]) {
-				pos++
-			}
-			cur.Next = &Token{
-				Kind: IDENT,
-				Str:  string(runes[start:pos]),
-				Pos:  pos,
-			}
-			cur = cur.Next
 			continue
 		}
 

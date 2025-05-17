@@ -16,6 +16,7 @@ const (
 	ASSIGN                 // =
 	LVAR                   // variable
 	RETURN                 // return statement
+	IF                     // if statement
 	EOF                    // end of file (optional, not usually needed in AST)
 )
 
@@ -26,6 +27,9 @@ type Node struct {
 	Rhs    *Node    // Right-hand side expression
 	Val    int      // Literal value (only used if Kind == NUM)
 	Offset int      // Offset for local variables (only used if Kind == LVAR)
+	Cond   *Node    // Condition for if statements
+	Then   *Node    // Then branch for if statements
+	Else   *Node    // Else branch for if statements
 }
 
 type LVar struct {

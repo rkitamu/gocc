@@ -25,7 +25,12 @@ func NewParser(token *lexer.Token, input string) *Parser {
 // Parse parses the input tokens and returns the root node of the parse tree.
 // supports the following grammar:
 // program = stmt*
-// stmt = expr ";" | "return" expr ";"
+// stmt = expr ";"
+//	| "return" expr ";"
+//	| "if" "{" expr "}" stmt ("else" stmt)?
+//	| "while" "(" expr ")" stmt
+//	| "for" "(" expr ";" expr ";" expr ")" stmt
+//
 // expr = assign
 // assign = equality ("=" assign)?
 // equality = relational ("==" relational | "!=" relational)*
@@ -50,7 +55,12 @@ func (p *Parser) program() error {
 	return nil
 }
 
-// stmt = expr ";" | "return" expr ";"
+// stmt = expr ";"
+//
+//	| "return" expr ";"
+//	| "if" "(" expr ")" stmt ("else" stmt)?
+//	| "while" "(" expr ")" stmt
+//	| "for" "(" expr ";" expr ";" expr ")" stmt
 func (p *Parser) stmt() (*Node, error) {
 	if p.match("return") {
 		p.advance()
@@ -62,7 +72,33 @@ func (p *Parser) stmt() (*Node, error) {
 			return nil, err
 		}
 		return &Node{Kind: RETURN, Lhs: node}, nil
+	} else if p.match("if") {
+		p.advance()
+		if err := p.expect("("); err != nil {
+			return nil, err
+		}
+		conditionNode, err := p.expr()
+		if err != nil {
+			return nil, err
+		}
+		if err := p.expect(")"); err != nil {
+			return nil, err
+		}
+		thenNode, err := p.stmt()
+		if err != nil {
+			return nil, err
+		}
+		elseNode := (*Node)(nil)
+		if p.match("else") {
+			p.advance()
+			elseNode, err = p.stmt()
+			if err != nil {
+				return nil, err
+			}
+		}
+		return &Node{Kind: IF, Cond: conditionNode, Then: thenNode, Else: elseNode}, nil
 	}
+
 	node, err := p.expr()
 	if err != nil {
 		return nil, err
