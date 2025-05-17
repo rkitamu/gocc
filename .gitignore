@@ -32,6 +32,7 @@ compile_target/**/*
 
 # tmporary files
 *.tmp
+tmp
 
 # generated files
 *.s

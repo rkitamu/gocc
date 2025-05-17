@@ -1,0 +1,42 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Go Build",
+      "type": "shell",
+      "command": "go build",
+      "problemMatcher": [],
+      "group": "build"
+    },
+    {
+      "label": "Go Run (generate asm)",
+      "type": "shell",
+      "command": "${workspaceFolder}/gocc -i ${workspaceFolder}/compile_target/main.c -o ${workspaceFolder}/dist/tmp.s",
+      "problemMatcher": []
+    },
+    {
+      "label": "Assemble tmp.s",
+      "type": "shell",
+      "command": "cc -o ${workspaceFolder}/dist/tmp ${workspaceFolder}/dist/tmp.s",
+      "problemMatcher": []
+    },
+    {
+      "label": "Run tmp binary",
+      "type": "shell",
+      "command": "${workspaceFolder}/dist/tmp",
+      "problemMatcher": []
+    },
+    {
+      "label": "Full Build and Run",
+      "dependsOn": [
+        "Go Build",
+        "Go Run (generate asm)",
+        "Assemble tmp.s",
+        "Run tmp binary"
+      ],
+      "dependsOrder": "sequence",
+      "problemMatcher": [],
+      "group": "test"
+    }
+  ]
+}
