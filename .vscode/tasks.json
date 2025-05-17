@@ -23,7 +23,7 @@
     {
       "label": "Run tmp binary",
       "type": "shell",
-      "command": "${workspaceFolder}/dist/tmp",
+      "command": "${workspaceFolder}/dist/tmp; echo $?",
       "problemMatcher": []
     },
     {

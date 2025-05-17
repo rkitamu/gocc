@@ -64,6 +64,12 @@ func run() error {
 		return err
 	}
 
+	// optionally print tokens
+	if cliArgs.Debug {
+		fmt.Println("=== Tokens ===")
+		lexer.DebugPrintTokens(tokens)
+	}
+
 	// parse tokens
 	parser := parser.NewParser(tokens, input)
 	err = parser.Parse()
