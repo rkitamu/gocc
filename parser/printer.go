@@ -9,6 +9,12 @@ func (p Parser) PrintTree(node *Node) {
 	printTreeRec(node, "", true)
 }
 
+func (p Parser) PrintTreeForMultiStatement(node []*Node) {
+	for _, n := range node {
+		printTreeRec(n, "", true)
+	}
+}
+
 func printTreeRec(node *Node, prefix string, isTail bool) {
 	if node == nil {
 		return
@@ -58,6 +64,10 @@ func nodeKindToString(kind NodeKind) string {
 		return "<"
 	case LTE:
 		return "<="
+	case ASSIGN:
+		return "="
+	case LVAR:
+		return "LVAR"
 	default:
 		return "?"
 	}

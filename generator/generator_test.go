@@ -16,7 +16,7 @@ func TestGenerator_Addition(t *testing.T) {
 	}
 
 	gen := generator.NewGenerator()
-	asm := gen.Generate(node)
+	asm, _ := gen.Generate(node)
 
 	checks := []string{
 		"push 1",
@@ -44,7 +44,7 @@ func TestGenerator_Equality(t *testing.T) {
 	}
 
 	gen := generator.NewGenerator()
-	asm := gen.Generate(node)
+	asm, _ := gen.Generate(node)
 
 	expected := []string{
 		"cmp rax, rdi",
@@ -67,7 +67,7 @@ func TestGenerator_Subtraction(t *testing.T) {
 	}
 
 	gen := generator.NewGenerator()
-	asm := gen.Generate(node)
+	asm, _ := gen.Generate(node)
 
 	if !strings.Contains(asm, "sub rax, rdi") {
 		t.Errorf("sub instruction missing in:\n%s", asm)
@@ -86,7 +86,7 @@ func TestGenerator_NestedExpr(t *testing.T) {
 	}
 
 	gen := generator.NewGenerator()
-	asm := gen.Generate(node)
+	asm, _ := gen.Generate(node)
 
 	if !strings.Contains(asm, "imul rax, rdi") {
 		t.Errorf("imul instruction missing in nested expression:\n%s", asm)
@@ -101,7 +101,7 @@ func TestGenerator_LessThan(t *testing.T) {
 	}
 
 	gen := generator.NewGenerator()
-	asm := gen.Generate(node)
+	asm, _ := gen.Generate(node)
 
 	expected := []string{
 		"cmp rax, rdi",

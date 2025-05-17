@@ -66,7 +66,7 @@ func run() error {
 
 	// parse tokens
 	parser := parser.NewParser(tokens, input)
-	node, err := parser.Parse()
+	err = parser.Parse()
 	if err != nil {
 		return err
 	}
@@ -74,12 +74,15 @@ func run() error {
 	// optionally print AST
 	if cliArgs.Debug {
 		fmt.Println("=== AST ===")
-		parser.PrintTree(node)
+		parser.PrintTreeForMultiStatement(parser.Code)
 	}
 
 	// generate assembly code
 	gen := generator.NewGenerator()
-	asm := gen.Generate(node)
+	asm, err := gen.GenerateForMultiStatement(parser.Code)
+	if err != nil {
+		return err
+	}
 
 	// write to output file
 	if err := os.WriteFile(cliArgs.Output, []byte(asm), 0644); err != nil {

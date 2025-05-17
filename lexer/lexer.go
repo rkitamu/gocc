@@ -25,7 +25,7 @@ func isDigit(ch rune) bool {
 }
 
 func isSymbol(ch rune) bool {
-	return strings.ContainsRune("+-*/=()<>", ch)
+	return strings.ContainsRune("+-*/=()<>;", ch)
 }
 
 // Lex takes an input string and returns a linked list of tokens.

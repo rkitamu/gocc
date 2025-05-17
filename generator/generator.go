@@ -3,6 +3,7 @@ package generator
 import (
 	"fmt"
 	"rkitamu/gocc/parser"
+
 	"strings"
 )
 
@@ -16,32 +17,97 @@ func NewGenerator() *Generator {
 	}
 }
 
-func (g *Generator) Generate(node *parser.Node) string {
+func (g *Generator) Generate(node *parser.Node) (string, error) {
 	g.emit(".intel_syntax noprefix")
 	g.emit(".global main")
 	g.emit("main:")
 
 	// TODO: now we only support a single expression
-	g.emitExpr(node)
+	if err := g.emitExpr(node); err != nil {
+		return "", err
+	}
 	g.emit("  pop rax")
 	g.emit("  ret")
 
 	g.emit(".section .note.GNU-stack,\"\",@progbits")
-	return g.sb.String()
+	return g.sb.String(), nil
+}
+
+func (g *Generator) GenerateForMultiStatement(node []*parser.Node) (string, error) {
+	g.emit(".intel_syntax noprefix")
+	g.emit(".global main")
+	g.emit("main:")
+
+	// 変数26個分の領域を確保
+	g.emit("  push rbp")
+	g.emit("  mov rbp, rsp")
+	g.emit("  sub rsp, 208")
+
+	for _, n := range node {
+		err := g.emitExpr(n)
+		if err != nil {
+			return "", err
+		}
+		g.emit("  pop rax")
+	}
+
+	g.emit("  mov rsp, rbp")
+	g.emit("  pop rbp")
+	g.emit("  ret")
+	g.emit(".section .note.GNU-stack,\"\",@progbits")
+	return g.sb.String(), nil
 }
 
 func (g *Generator) emit(line string) {
 	fmt.Fprintln(g.sb, line)
 }
 
-func (g *Generator) emitExpr(node *parser.Node) {
-	if node.Kind == parser.NUM {
-		g.emit(fmt.Sprintf("  push %d", node.Val))
-		return
+func (g *Generator) emitLval(node *parser.Node) error {
+	if node.Kind == parser.LVAR {
+		g.emit("  mov rax, rbp")
+		g.emit(fmt.Sprintf("  sub rax, %d", node.Offset))
+		g.emit("  push rax")
+	} else {
+		return fmt.Errorf("not lval: ")
 	}
 
-	g.emitExpr(node.Lhs)
-	g.emitExpr(node.Rhs)
+	return nil
+}
+
+func (g *Generator) emitExpr(node *parser.Node) error {
+	if node.Kind == parser.NUM {
+		g.emit(fmt.Sprintf("  push %d", node.Val))
+		return nil
+	} else if node.Kind == parser.LVAR {
+		err := g.emitLval(node)
+		if err != nil {
+			return err
+		}
+		g.emit("  pop rax")
+		g.emit("  mov rax, [rax]")
+		g.emit("  push rax")
+		return nil
+	} else if node.Kind == parser.ASSIGN {
+		if err := g.emitLval(node.Lhs); err != nil {
+			return err
+		}
+		if err := g.emitExpr(node.Rhs); err != nil {
+			return err
+		}
+
+		g.emit("  pop rdi")
+		g.emit("  pop rax")
+		g.emit("  mov [rax], rdi")
+		g.emit("  push rdi")
+		return nil
+	}
+
+	if err := g.emitExpr(node.Lhs); err != nil {
+		return err
+	}
+	if err := g.emitExpr(node.Rhs); err != nil {
+		return err
+	}
 
 	g.emit("  pop rdi")
 	g.emit("  pop rax")
@@ -75,4 +141,6 @@ func (g *Generator) emitExpr(node *parser.Node) {
 	}
 
 	g.emit("  push rax")
+
+	return nil
 }

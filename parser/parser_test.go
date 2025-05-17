@@ -140,7 +140,8 @@ func TestParse_GrammarCoverage(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			p := parser.NewParser(tt.tokens, tt.input)
-			got, err := p.Parse()
+			err := p.Parse()
+			got := p.Code[0]
 			if err != nil {
 				t.Fatalf("parse error: %v", err)
 			}
