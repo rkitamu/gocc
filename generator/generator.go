@@ -51,9 +51,6 @@ func (g *Generator) GenerateForMultiStatement(node []*parser.Node) (string, erro
 		g.emit("  pop rax")
 	}
 
-	g.emit("  mov rsp, rbp")
-	g.emit("  pop rbp")
-	g.emit("  ret")
 	g.emit(".section .note.GNU-stack,\"\",@progbits")
 	return g.sb.String(), nil
 }
@@ -99,6 +96,15 @@ func (g *Generator) emitExpr(node *parser.Node) error {
 		g.emit("  pop rax")
 		g.emit("  mov [rax], rdi")
 		g.emit("  push rdi")
+		return nil
+	} else if node.Kind == parser.RETURN {
+		if err := g.emitExpr(node.Lhs); err != nil {
+			return err
+		}
+		g.emit("  pop rax")
+		g.emit("  mov rsp, rbp")
+		g.emit("  pop rbp")
+		g.emit("  ret")
 		return nil
 	}
 

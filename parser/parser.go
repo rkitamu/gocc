@@ -25,7 +25,7 @@ func NewParser(token *lexer.Token, input string) *Parser {
 // Parse parses the input tokens and returns the root node of the parse tree.
 // supports the following grammar:
 // program = stmt*
-// stmt = expr ";"
+// stmt = expr ";" | "return" expr ";"
 // expr = assign
 // assign = equality ("=" assign)?
 // equality = relational ("==" relational | "!=" relational)*
@@ -40,7 +40,7 @@ func (p *Parser) Parse() error {
 
 // program = stmt*
 func (p *Parser) program() error {
-	for i := 0; !p.atEnd(); i++ {
+	for !p.atEnd() {
 		node, err := p.stmt()
 		if err != nil {
 			return err
@@ -50,8 +50,19 @@ func (p *Parser) program() error {
 	return nil
 }
 
-// stmt = expr ";"
+// stmt = expr ";" | "return" expr ";"
 func (p *Parser) stmt() (*Node, error) {
+	if p.match("return") {
+		p.advance()
+		node, err := p.expr()
+		if err != nil {
+			return nil, err
+		}
+		if err := p.expect(";"); err != nil {
+			return nil, err
+		}
+		return &Node{Kind: RETURN, Lhs: node}, nil
+	}
 	node, err := p.expr()
 	if err != nil {
 		return nil, err

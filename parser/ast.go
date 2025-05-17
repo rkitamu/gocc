@@ -15,6 +15,7 @@ const (
 	NUM                    // number literal
 	ASSIGN                 // =
 	LVAR                   // variable
+	RETURN                 // return statement
 	EOF                    // end of file (optional, not usually needed in AST)
 )
 
